@@ -29,7 +29,20 @@
     <a href="contact.html">Contact</a>
   </div>
   <a href="contact.html" class="nav__cta">Start a Project</a>
+  <button class="nav__burger" id="navBurger" aria-label="Open menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<!-- ================= MOBILE MENU ================= -->
+<div class="mobile-menu" id="mobileMenu">
+  <nav class="mobile-menu__links">
+    <a href="services.html">Services</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="contact.html">Start a Project</a>
+  </nav>
+</div>
 
 <main id="site">
 
@@ -44,7 +57,9 @@
 
   <!-- ================= INQUIRY FORM ================= -->
   <section class="form-section">
-    <form class="form reveal" id="contactForm" novalidate>
+
+    <!-- Formspree endpoint: sends submissions to hello@unitfourgroup.com -->
+    <form class="form reveal" id="contactForm" action="https://formspree.io/f/mppwdblo" method="POST" novalidate>
 
       <div class="form__row">
         <div class="form__group">
@@ -52,14 +67,9 @@
           <input type="text" id="fullName" name="fullName" required autocomplete="name">
         </div>
         <div class="form__group">
-          <label for="companyName">Company Name</label>
-          <input type="text" id="companyName" name="companyName" required autocomplete="organization">
+          <label for="businessName">Business Name</label>
+          <input type="text" id="businessName" name="businessName" required autocomplete="organization">
         </div>
-      </div>
-
-      <div class="form__group">
-        <label for="companyAbout">What Does Your Company Do?</label>
-        <textarea id="companyAbout" name="companyAbout" rows="3" required></textarea>
       </div>
 
       <div class="form__row">
@@ -74,24 +84,24 @@
       </div>
 
       <div class="form__group">
-        <label for="service">Service You're Interested In</label>
-        <select id="service" name="service" required>
-          <option value="" disabled selected>Select a service</option>
-          <option value="Website & App Development">Website &amp; App Development</option>
-          <option value="Customisation & Digital Solutions">Customisation &amp; Digital Solutions</option>
-          <option value="Marketing & Growth Strategies">Marketing &amp; Growth Strategies</option>
-          <option value="Business Support & Consulting">Business Support &amp; Consulting</option>
-          <option value="Not Sure Yet">Not Sure Yet</option>
-        </select>
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="5" required></textarea>
       </div>
 
       <button type="submit" class="contact__btn form__submit">
-        <span>Send Inquiry</span>
+        <span>Send Message</span>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 19L19 5M19 5H8M19 5V16" stroke="currentColor" stroke-width="1.6"/></svg>
       </button>
 
-      <p class="form__note">Submitting opens your email client with your details prefilled, addressed to us.</p>
+      <p class="form__note">We typically reply within one business day.</p>
+      <p class="form__error" id="formError" hidden>Something went wrong sending your message. Please try again, or email us directly below.</p>
     </form>
+
+    <div class="form__success" id="formSuccess" hidden>
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="1.6"/></svg>
+      <h3>Message Sent</h3>
+      <p>Thanks for reaching out. We'll get back to you within one business day.</p>
+    </div>
 
     <p class="form__alt reveal">Prefer to skip the form? Email us directly at <a href="mailto:hello@unitfourgroup.com">hello@unitfourgroup.com</a></p>
   </section>
@@ -105,6 +115,9 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-config.js"></script>
 <script src="js/page.js"></script>
+<script src="js/nav.js"></script>
 </body>
 </html>

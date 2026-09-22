@@ -1,0 +1,84 @@
+/* ============================================================
+   UNIT FOUR — admin.css
+   Login gate + submissions dashboard. Loaded after css/style.css,
+   so it reuses the same colour variables, fonts and .form__group /
+   .contact__btn styles as the rest of the site.
+   ============================================================ */
+
+.admin-login[hidden], .admin-dashboard[hidden]{ display:none; }
+
+.admin-login{
+  min-height:100vh;
+  display:flex; align-items:center; justify-content:center;
+  padding:24px;
+}
+.admin-login__box{
+  width:100%; max-width:380px;
+  padding:48px 40px;
+  border:1px solid var(--line);
+  text-align:center;
+}
+.admin-login__logo{ display:inline-flex; margin-bottom:32px; }
+.admin-login__box h1{
+  font-family:'Playfair Display', serif;
+  font-size:1.6rem;
+  margin-bottom:32px;
+}
+.admin-login__box .form__group{ text-align:left; margin-bottom:22px; }
+.admin-login__error{
+  color:#e8a15a;
+  font-size:0.85rem;
+  margin:-8px 0 20px;
+}
+.admin-login__box .form__submit{
+  width:100%; justify-content:center;
+}
+
+.admin-dashboard{ min-height:100vh; padding:40px clamp(20px,4vw,60px); }
+
+.admin-dashboard__header{
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:20px;
+  padding-bottom:28px; margin-bottom:36px;
+  border-bottom:1px solid var(--line);
+}
+.admin-dashboard__header h1{
+  font-family:'Playfair Display', serif;
+  font-size:1.8rem;
+}
+.admin-logout{
+  background:none; border:1px solid var(--gold-dim); color:var(--gold-light);
+  font-family:'Inter', sans-serif;
+  font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase;
+  padding:10px 20px; cursor:pointer;
+  transition:all 0.3s var(--ease);
+}
+.admin-logout:hover{ background:var(--gold); color:var(--black); border-color:var(--gold); }
+
+.admin-status{ color:var(--ink-dim); font-size:0.95rem; }
+.admin-status[data-state="error"]{ color:#e8a15a; }
+
+.admin-table-wrap{ overflow-x:auto; border:1px solid var(--line); }
+.admin-table{ width:100%; border-collapse:collapse; min-width:820px; }
+.admin-table th{
+  text-align:left; padding:16px 20px;
+  font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase;
+  color:var(--gold);
+  border-bottom:1px solid var(--line);
+  white-space:nowrap;
+}
+.admin-table td{
+  padding:16px 20px;
+  font-size:0.9rem;
+  color:var(--ink-dim);
+  border-bottom:1px solid var(--line);
+  vertical-align:top;
+}
+.admin-table tr:last-child td{ border-bottom:none; }
+.admin-table td:nth-child(2){ color:var(--ink); font-weight:500; }
+.admin-table td.admin-table__message{ max-width:320px; white-space:pre-wrap; }
+.admin-table tr:hover td{ background:rgba(201,162,39,0.045); }
+
+@media (max-width:640px){
+  .admin-dashboard__header{ flex-direction:column; text-align:center; }
+}

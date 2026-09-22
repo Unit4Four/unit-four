@@ -29,42 +29,68 @@ gsap.utils.toArray('.reveal').forEach((el) => {
   });
 });
 
-/* ---------------- Contact form (contact.html only) ---------------- */
+/* ---------------- Contact form (contact.html only) ----------------
+   Submits to Formspree (emails hello@unitfourgroup.com) and, if
+   Supabase is configured (see js/supabase-config.js), also saves the
+   submission so it shows up in /admin. Formspree is the one that must
+   succeed for the user to see a success message — the Supabase save
+   is best-effort and never blocks the form. */
 
 const contactForm = document.getElementById('contactForm');
 
 if (contactForm) {
-  contactForm.addEventListener('submit', (e) => {
+  const submitBtn = contactForm.querySelector('.form__submit');
+  const submitLabel = submitBtn.querySelector('span');
+  const errorEl = document.getElementById('formError');
+  const successEl = document.getElementById('formSuccess');
+
+  contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!contactForm.reportValidity()) return;
 
+    errorEl.hidden = true;
+    submitBtn.disabled = true;
+    const originalLabel = submitLabel.textContent;
+    submitLabel.textContent = 'Sending...';
+
     const data = new FormData(contactForm);
-    const fullName = data.get('fullName').trim();
-    const companyName = data.get('companyName').trim();
-    const companyAbout = data.get('companyAbout').trim();
-    const email = data.get('email').trim();
-    const phone = data.get('phone').trim() || 'Not provided';
-    const service = data.get('service');
+    const submission = {
+      full_name: data.get('fullName').trim(),
+      business_name: data.get('businessName').trim(),
+      email: data.get('email').trim(),
+      phone: data.get('phone').trim(),
+      message: data.get('message').trim(),
+    };
 
-    const subject = `New Project Inquiry from ${companyName}`;
-    const body =
-      `Full Name: ${fullName}\n` +
-      `Company Name: ${companyName}\n` +
-      `What They Do: ${companyAbout}\n` +
-      `Email: ${email}\n` +
-      `Phone: ${phone}\n` +
-      `Service Interested In: ${service}\n\n` +
-      `Submitted via the Unit Four contact form.`;
+    let emailSent = false;
+    try {
+      const res = await fetch(contactForm.action, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: data,
+      });
+      emailSent = res.ok;
+    } catch (err) {
+      emailSent = false;
+    }
 
-    const mailtoUrl = `mailto:hello@unitfourgroup.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    if (supabaseClient) {
+      try {
+        await supabaseClient.from('submissions').insert([submission]);
+      } catch (err) {
+        console.error('Supabase insert failed:', err);
+      }
+    }
 
-    const submitBtn = contactForm.querySelector('.form__submit span');
-    const originalLabel = submitBtn.textContent;
-    submitBtn.textContent = 'Opening Your Email...';
+    submitBtn.disabled = false;
+    submitLabel.textContent = originalLabel;
 
-    window.location.href = mailtoUrl;
-
-    setTimeout(() => { submitBtn.textContent = originalLabel; }, 2500);
+    if (emailSent) {
+      contactForm.hidden = true;
+      successEl.hidden = false;
+    } else {
+      errorEl.hidden = false;
+    }
   });
 }
 

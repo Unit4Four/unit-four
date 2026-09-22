@@ -39,7 +39,20 @@
     <a href="contact.html">Contact</a>
   </div>
   <a href="contact.html" class="nav__cta">Start a Project</a>
+  <button class="nav__burger" id="navBurger" aria-label="Open menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<!-- ================= MOBILE MENU ================= -->
+<div class="mobile-menu" id="mobileMenu">
+  <nav class="mobile-menu__links">
+    <a href="services.html">Services</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="contact.html">Start a Project</a>
+  </nav>
+</div>
 
 <main id="site" class="main--with-intro">
 
@@ -138,8 +151,8 @@
     <div class="contact__inner">
       <p class="eyebrow reveal">Get In Touch</p>
       <h2 class="reveal">Let's build something<br>that sets the trend.</h2>
-      <a class="contact__btn reveal" href="mailto:hello@unitfourgroup.com?subject=New%20Project%20Inquiry">
-        <span>hello@unitfourgroup.com</span>
+      <a class="contact__btn reveal" href="contact.html">
+        <span>Start a Project</span>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 19L19 5M19 5H8M19 5V16" stroke="currentColor" stroke-width="1.6"/></svg>
       </a>
     </div>
@@ -155,5 +168,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="js/main.js"></script>
+<script src="js/nav.js"></script>
 </body>
 </html>
