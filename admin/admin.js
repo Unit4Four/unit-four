@@ -28,6 +28,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginError = document.getElementById('loginError');
   const logoutBtn = document.getElementById('logoutBtn');
 
+  /* sessionStorage can throw (privacy modes, sandboxed previews, some
+     static-host iframes) — on a static site with no server to fall back
+     on, that's fatal if it's allowed to bubble up: it would stop this
+     whole script before the login form's submit listener ever attaches,
+     and the browser would silently fall back to a native form submit
+     (page reload, credentials in the URL) instead of showing the
+     dashboard. These helpers make storage best-effort only, so a broken
+     sessionStorage never breaks the actual login check below. */
+  function getAuthFlag () {
+    try { return sessionStorage.getItem(AUTH_KEY) === 'true'; }
+    catch (err) { console.warn('sessionStorage unavailable:', err); return false; }
+  }
+  function setAuthFlag () {
+    try { sessionStorage.setItem(AUTH_KEY, 'true'); }
+    catch (err) { console.warn('sessionStorage unavailable:', err); }
+  }
+  function clearAuthFlag () {
+    try { sessionStorage.removeItem(AUTH_KEY); }
+    catch (err) { console.warn('sessionStorage unavailable:', err); }
+  }
+
   function showDashboard () {
     loginSection.hidden = true;
     dashboardSection.hidden = false;
@@ -39,17 +60,18 @@ document.addEventListener('DOMContentLoaded', () => {
     loginSection.hidden = false;
   }
 
-  if (sessionStorage.getItem(AUTH_KEY) === 'true') {
-    showDashboard();
-  }
-
+  /* Attach the submit handler first, before anything else that could
+     possibly throw (like the auto-login check below) — that way a
+     failure elsewhere can never leave this form without a listener,
+     which is what would cause a native form submit (page reload,
+     credentials in the URL) instead of a login. */
   loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
 
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      sessionStorage.setItem(AUTH_KEY, 'true');
+      setAuthFlag();
       loginError.hidden = true;
       loginForm.reset();
       showDashboard();
@@ -59,9 +81,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   logoutBtn.addEventListener('click', () => {
-    sessionStorage.removeItem(AUTH_KEY);
+    clearAuthFlag();
     showLogin();
   });
+
+  if (getAuthFlag()) {
+    showDashboard();
+  }
 
   async function loadSubmissions () {
     const status = document.getElementById('adminStatus');
