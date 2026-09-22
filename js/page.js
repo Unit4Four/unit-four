@@ -56,7 +56,7 @@ if (contactForm) {
       `Service Interested In: ${service}\n\n` +
       `Submitted via the Unit Four contact form.`;
 
-    const mailtoUrl = `mailto:hello@unitfour.studio?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const mailtoUrl = `mailto:hello@unitfourgroup.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
     const submitBtn = contactForm.querySelector('.form__submit span');
     const originalLabel = submitBtn.textContent;
