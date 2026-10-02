@@ -44,5 +44,5 @@ const supabaseClient = (
 ) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
 if (!supabaseClient) {
-  console.warn('Supabase is not configured yet — see js/supabase-config.js. Form submissions will still email via Formspree, but will not be saved for the admin dashboard.');
+  console.warn('Supabase is not configured yet. See js/supabase-config.js. Form submissions will still email via EmailJS, but will not be saved for the admin dashboard.');
 }

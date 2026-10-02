@@ -30,11 +30,14 @@ gsap.utils.toArray('.reveal').forEach((el) => {
 });
 
 /* ---------------- Contact form (contact.html only) ----------------
-   Submits to Formspree (emails hello@unitfourgroup.com) and, if
-   Supabase is configured (see js/supabase-config.js), also saves the
-   submission so it shows up in /admin. Formspree is the one that must
-   succeed for the user to see a success message — the Supabase save
-   is best-effort and never blocks the form. */
+   On submit, three things happen in parallel:
+     1. EmailJS sends a notification to hello@unitfourgroup.com
+     2. EmailJS sends the visitor an automatic reply with a link to
+        the pricing guide
+     3. The submission is saved to Supabase for the /admin dashboard
+   Only the notification (1) has to succeed for the visitor to see the
+   success message. The auto-reply and the save are best-effort, so a
+   hiccup in either never turns a delivered enquiry into an error. */
 
 const contactForm = document.getElementById('contactForm');
 
@@ -43,6 +46,39 @@ if (contactForm) {
   const submitLabel = submitBtn.querySelector('span');
   const errorEl = document.getElementById('formError');
   const successEl = document.getElementById('formSuccess');
+
+  function sendEmail (templateId, params) {
+    if (!emailjsConfigured) return Promise.reject(new Error('EmailJS is not configured'));
+    return emailjs.send(EMAILJS_SERVICE_ID, templateId, params);
+  }
+
+  function sendNotification (s) {
+    return sendEmail(EMAILJS_NOTIFY_TEMPLATE_ID, {
+      full_name: s.full_name,
+      business_name: s.business_name,
+      email: s.email,
+      phone: s.phone || 'Not provided',
+      message: s.message,
+      submitted_at: new Date().toLocaleString('en-GB', {
+        timeZone: 'Europe/London', dateStyle: 'medium', timeStyle: 'short',
+      }),
+    });
+  }
+
+  function sendAutoReply (s) {
+    return sendEmail(EMAILJS_REPLY_TEMPLATE_ID, {
+      to_name: s.full_name.split(' ')[0],
+      to_email: s.email,
+      business_name: s.business_name,
+      pricing_guide_url: PRICING_GUIDE_URL,
+    });
+  }
+
+  async function saveSubmission (s) {
+    if (!supabaseClient) return;
+    const { error } = await supabaseClient.from('submissions').insert([s]);
+    if (error) throw error;
+  }
 
   contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -62,30 +98,20 @@ if (contactForm) {
       message: data.get('message').trim(),
     };
 
-    let emailSent = false;
-    try {
-      const res = await fetch(contactForm.action, {
-        method: 'POST',
-        headers: { 'Accept': 'application/json' },
-        body: data,
-      });
-      emailSent = res.ok;
-    } catch (err) {
-      emailSent = false;
-    }
-
-    if (supabaseClient) {
-      try {
-        await supabaseClient.from('submissions').insert([submission]);
-      } catch (err) {
-        console.error('Supabase insert failed:', err);
-      }
-    }
+    const steps = ['notification email', 'auto-reply email', 'Supabase save'];
+    const results = await Promise.allSettled([
+      sendNotification(submission),
+      sendAutoReply(submission),
+      saveSubmission(submission),
+    ]);
+    results.forEach((result, i) => {
+      if (result.status === 'rejected') console.error(steps[i] + ' failed:', result.reason);
+    });
 
     submitBtn.disabled = false;
     submitLabel.textContent = originalLabel;
 
-    if (emailSent) {
+    if (results[0].status === 'fulfilled') {
       contactForm.hidden = true;
       successEl.hidden = false;
     } else {
