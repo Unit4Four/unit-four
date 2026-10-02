@@ -47,6 +47,29 @@ if (contactForm) {
   const errorEl = document.getElementById('formError');
   const successEl = document.getElementById('formSuccess');
 
+  const fields = contactForm.querySelectorAll('input, textarea');
+  const phoneField = document.getElementById('phone');
+
+  /* Native `required` accepts whitespace-only values and the tel input
+     checks nothing about format, so validity is set by hand here. */
+  function checkField (field) {
+    const value = field.value.trim();
+    let message = '';
+
+    if (field.required && !value) {
+      message = 'Please fill out this field.';
+    } else if (field === phoneField) {
+      const digits = value.replace(/\D/g, '');
+      if (!/^[+()\d\s.-]+$/.test(value) || digits.length < 7 || digits.length > 15) {
+        message = 'Please enter a valid phone number, for example 07123 456789.';
+      }
+    }
+
+    field.setCustomValidity(message);
+  }
+
+  fields.forEach((field) => field.addEventListener('input', () => checkField(field)));
+
   function sendEmail (templateId, params) {
     if (!emailjsConfigured) return Promise.reject(new Error('EmailJS is not configured'));
     return emailjs.send(EMAILJS_SERVICE_ID, templateId, params);
@@ -57,7 +80,7 @@ if (contactForm) {
       full_name: s.full_name,
       business_name: s.business_name,
       email: s.email,
-      phone: s.phone || 'Not provided',
+      phone: s.phone,
       message: s.message,
       submitted_at: new Date().toLocaleString('en-GB', {
         timeZone: 'Europe/London', dateStyle: 'medium', timeStyle: 'short',
@@ -82,6 +105,7 @@ if (contactForm) {
 
   contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    fields.forEach(checkField);
     if (!contactForm.reportValidity()) return;
 
     errorEl.hidden = true;

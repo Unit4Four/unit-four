@@ -530,9 +530,6 @@ button.contact__btn{
   font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase;
   color:var(--gold);
 }
-.form__optional{
-  color:var(--ink-dim); text-transform:none; letter-spacing:0;
-}
 
 .form__group input,
 .form__group textarea,
