@@ -8,7 +8,7 @@
 .admin-login[hidden], .admin-dashboard[hidden]{ display:none; }
 
 .admin-login{
-  min-height:100vh;
+  min-height:var(--vh100, 100vh);
   display:flex; align-items:center; justify-content:center;
   padding:24px;
 }
@@ -34,7 +34,7 @@
   width:100%; justify-content:center;
 }
 
-.admin-dashboard{ min-height:100vh; padding:40px clamp(20px,4vw,60px); }
+.admin-dashboard{ min-height:var(--vh100, 100vh); padding:40px clamp(20px,4vw,60px); }
 
 .admin-dashboard__header{
   display:flex; align-items:center; justify-content:space-between;

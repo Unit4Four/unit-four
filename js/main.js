@@ -7,12 +7,20 @@ document.getElementById('year').textContent = new Date().getFullYear();
 
 gsap.registerPlugin(ScrollTrigger);
 
+/* Mobile browsers fire `resize` every time the address bar slides in or
+   out while scrolling. Without this, each one makes ScrollTrigger rebuild
+   every pin and trigger mid-scroll, which shows up as jumps and stalls. */
+ScrollTrigger.config({ ignoreMobileResize: true });
+
 /* ---------------- Intro: logo zoom ---------------- */
 
 const isMobile = window.matchMedia('(max-width:720px)').matches;
 const screenEl = document.getElementById('logoStage');
-/* kept short on purpose — this is a quick zoom-through, not a long scroll */
-const introScrollLength = () => (isMobile ? window.innerHeight * 1.1 : window.innerHeight * 1.3);
+const introEl = document.getElementById('intro');
+/* kept short on purpose, this is a quick zoom-through, not a long scroll.
+   Measured from the intro's own height (the stable small-viewport height)
+   rather than window.innerHeight, which changes with the toolbar. */
+const introScrollLength = () => introEl.offsetHeight * (isMobile ? 1.1 : 1.3);
 
 /* scale needed for the logo to fully cover the viewport, plus a little
    overshoot so the black "dive through" reads as deliberate rather than an
@@ -100,6 +108,3 @@ gsap.utils.toArray('.reveal').forEach((el, i) => {
     }
   });
 });
-
-/* Recalculate on resize */
-window.addEventListener('resize', () => ScrollTrigger.refresh());

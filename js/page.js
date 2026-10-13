@@ -9,6 +9,10 @@ document.getElementById('year').textContent = new Date().getFullYear();
 
 gsap.registerPlugin(ScrollTrigger);
 
+/* Ignore the resize events mobile browsers fire as the address bar slides
+   in and out, so scrolling never triggers a mid-scroll layout rebuild. */
+ScrollTrigger.config({ ignoreMobileResize: true });
+
 const nav = document.getElementById('siteNav');
 
 window.addEventListener('scroll', () => {
@@ -143,5 +147,3 @@ if (contactForm) {
     }
   });
 }
-
-window.addEventListener('resize', () => ScrollTrigger.refresh());

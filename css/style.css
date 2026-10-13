@@ -14,10 +14,19 @@
   --line: rgba(201,162,39,0.18);
   --ease: cubic-bezier(.22,1,.36,1);
   --container: 1240px;
+  /* full-height sections use the SMALL viewport on mobile, so they never
+     change size as the browser toolbar slides in and out mid-scroll */
+  --vh100: 100vh;
+}
+@supports (height:100svh){
+  :root{ --vh100: 100svh; }
 }
 
 *,*::before,*::after{ box-sizing:border-box; }
-html{ background:var(--black); scroll-behavior:smooth; }
+/* no scroll-behavior:smooth here: ScrollTrigger scrolls programmatically
+   on every refresh, and CSS smooth-scrolling turns those into animated
+   scrolls that fight the user's finger */
+html{ background:var(--black); }
 
 body{
   margin:0;
@@ -27,6 +36,9 @@ body{
   font-weight:400;
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
+  /* clip never makes body a scroll container, which `hidden` does and
+     which misbehaves with pinned/fixed elements on touch browsers */
+  overflow-x:clip;
 }
 
 ::selection{ background:var(--gold); color:var(--black); }
@@ -75,7 +87,7 @@ h1,h2,h3{
 
 .intro{
   position:relative;
-  height:100vh;
+  height:var(--vh100);
   width:100%;
   background:var(--black);
   overflow:hidden;
@@ -85,7 +97,6 @@ h1,h2,h3{
 .intro__stage{
   position:absolute; inset:0;
   display:flex; align-items:center; justify-content:center;
-  perspective:1600px;
 }
 
 .logo-stage{
@@ -139,6 +150,14 @@ h1,h2,h3{
 .nav.is-visible{ opacity:1; transform:translateY(0); pointer-events:auto; }
 .nav.is-solid{ background:rgba(6,6,5,0.78); backdrop-filter:blur(14px); border-bottom-color:var(--line); }
 
+/* On touch screens a blurred fixed bar and a full-screen blended grain
+   layer are re-composited on every scrolled frame, which is what makes
+   mid-range phones stutter. A solid bar and no grain costs nothing. */
+@media (hover:none) and (pointer:coarse){
+  .grain{ display:none; }
+  .nav.is-solid{ background:rgba(6,6,5,0.95); backdrop-filter:none; }
+}
+
 .nav__logo{ display:flex; align-items:center; }
 /* source file has its own black backdrop — screen blend drops it out
    against the page's near-black background, leaving just the gold mark */
@@ -174,7 +193,6 @@ h1,h2,h3{
   width:28px; height:20px;
   background:none; border:none; padding:0;
   cursor:pointer;
-  z-index:301;
 }
 .nav__burger span{
   position:absolute; left:0; width:100%; height:2px;
@@ -188,8 +206,11 @@ h1,h2,h3{
 .nav__burger.is-active span:nth-child(2){ opacity:0; }
 .nav__burger.is-active span:nth-child(3){ top:9px; transform:rotate(-45deg); }
 
+/* sits BELOW the nav (z-index 200) on purpose: the burger lives inside the
+   nav, so a menu above it would cover its own close button and leave the
+   page stuck with scrolling locked */
 .mobile-menu{
-  position:fixed; inset:0; z-index:300;
+  position:fixed; inset:0; z-index:190;
   display:flex; align-items:center; justify-content:center;
   background:var(--black);
   opacity:0; visibility:hidden;
@@ -243,7 +264,7 @@ main{ position:relative; z-index:10; background:var(--black); }
    the hero is already sitting there, cross-fading in as the intro fades
    out, instead of sliding up from off-screen afterward. Only index.html
    has the intro section, so this is scoped to its main specifically. */
-main.main--with-intro{ margin-top:-100vh; }
+main.main--with-intro{ margin-top:calc(var(--vh100) * -1); }
 
 section{ padding:clamp(100px,14vw,180px) clamp(24px,6vw,80px); position:relative; }
 
@@ -258,7 +279,7 @@ section{ padding:clamp(100px,14vw,180px) clamp(24px,6vw,80px); position:relative
    ============================================================ */
 
 .hero{
-  min-height:100vh;
+  min-height:var(--vh100);
   display:flex; flex-direction:column; justify-content:center;
   max-width:var(--container); margin:0 auto;
   padding-top:160px; padding-bottom:120px;

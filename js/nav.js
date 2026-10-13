@@ -35,4 +35,9 @@
   window.addEventListener('resize', () => {
     if (window.innerWidth > 768) closeMenu();
   });
+
+  /* Back/forward can restore this page from the browser's cache exactly as
+     it was left, including body scrolling locked by an open menu. Always
+     come back unlocked. */
+  window.addEventListener('pageshow', closeMenu);
 })();
