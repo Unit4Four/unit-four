@@ -138,7 +138,9 @@ function collapseIntro () {
   const drift = heroEl.getBoundingClientRect().top - heroTopBefore;
   if (drift) window.scrollBy(0, drift);
 
-  headlineTl.progress(1);
+  /* A jump straight to the top can have queued headlineTl.reverse() just
+     before this ran; clear that direction so it doesn't unwind the headline. */
+  headlineTl.reversed(false).pause().progress(1);
   nav.classList.add('is-visible');
 
   /* With no intro above it the hero is the top of the page, so the nav
